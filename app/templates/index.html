@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7f4">
+  <meta name="description" content="Turn a client brief into a professional proposal with local AI powered by Gemma and Ollama.">
+  <title>PitchPilot — AI proposals for freelancers</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <script src="/static/js/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="PitchPilot home">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span>PitchPilot</span>
+    </a>
+    <div class="topbar-actions">
+      <div id="model-status" class="model-status status-checking" role="status" aria-live="polite">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="model-status-label">Connecting to Ollama…</span>
+      </div>
+      <button class="button button-quiet privacy-button" id="privacy-open" type="button">
+        <span class="privacy-icon" aria-hidden="true">●</span>
+        Local AI &amp; privacy
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">YOUR NEXT PROJECT, WELL PITCHED</p>
+        <h1 id="page-title">Make a great first impression.</h1>
+        <p class="intro-copy">Turn a rough client brief into a clear, client-ready proposal with AI that runs locally.</p>
+      </div>
+      <div class="privacy-note">
+        <span class="privacy-check" aria-hidden="true">✓</span>
+        <span>Powered locally by <strong id="model-name">Gemma through Ollama</strong></span>
+      </div>
+    </section>
+
+    <div class="workspace">
+      <section class="configuration panel" aria-labelledby="brief-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">PROJECT DETAILS</p>
+            <h2 id="brief-title">Your brief</h2>
+          </div>
+          <div class="heading-actions">
+            <button class="button button-small button-quiet" id="load-demo-button" type="button">Load demo details</button>
+            <span class="step-label">01 <span aria-hidden="true">/</span> 02</span>
+          </div>
+        </div>
+
+        <form id="brief-form">
+          <div class="field-row">
+            <div class="field">
+              <label for="client-name">Client / company</label>
+              <input id="client-name" name="client_name" autocomplete="organization" maxlength="120" required placeholder="e.g. Northstar Accounting">
+            </div>
+            <div class="field">
+              <label for="project-name">Project name</label>
+              <input id="project-name" name="project_name" maxlength="160" required placeholder="e.g. Company website">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="project-type">Project type</label>
+              <select id="project-type" name="project_type" required>
+                <option value="Web Development">Web Development</option>
+                <option value="Mobile App">Mobile App</option>
+                <option value="DevOps / Cloud">DevOps / Cloud</option>
+                <option value="AI / Automation">AI / Automation</option>
+                <option value="UI/UX Design">UI/UX Design</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Content">Content</option>
+                <option value="Consulting">Consulting</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="timeline">Expected timeline</label>
+              <input id="timeline" name="timeline" maxlength="120" required placeholder="e.g. 4–6 weeks">
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="label-line">
+              <label for="brief">Client brief / requirements</label>
+              <span id="brief-count" class="field-hint">0 / 12,000</span>
+            </div>
+            <textarea id="brief" name="brief" rows="7" maxlength="12000" required placeholder="Paste the client's request. Include goals, features, and anything they've already decided."></textarea>
+          </div>
+
+          <fieldset class="budget-fields">
+            <legend>Budget</legend>
+            <div class="field-row budget-row">
+              <div class="field">
+                <label for="budget-type">Budget type</label>
+                <select id="budget-type" name="budget_type">
+                  <option value="unknown">Unknown / needs estimate</option>
+                  <option value="fixed">Fixed budget</option>
+                  <option value="hourly">Hourly rate</option>
+                </select>
+              </div>
+              <div class="field budget-amount-field">
+                <label for="budget-amount">Amount or rate</label>
+                <input id="budget-amount" name="budget_amount" maxlength="80" placeholder="e.g. 5,000 or 85 / hour" disabled>
+              </div>
+              <div class="field currency-field">
+                <label for="currency">Currency</label>
+                <select id="currency" name="currency">
+                  <option>USD</option><option>EUR</option><option>GBP</option><option>INR</option>
+                  <option>CAD</option><option>AUD</option><option>NZD</option><option>SGD</option>
+                </select>
+              </div>
+            </div>
+            <p class="field-hint budget-hint">Pricing generated by AI is an estimate. Review scope, rates, taxes, and contract terms before sending.</p>
+          </fieldset>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="freelancer-name">Your name / business</label>
+              <input id="freelancer-name" name="freelancer_name" maxlength="120" required placeholder="e.g. Alex Morgan Studio">
+            </div>
+            <div class="field">
+              <label for="expertise">Experience / expertise <span class="optional">Optional</span></label>
+              <input id="expertise" name="expertise" maxlength="1000" placeholder="Relevant skills or focus">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="tone">Writing tone</label>
+              <select id="tone" name="tone">
+                <option>Professional</option><option>Friendly</option><option>Concise</option>
+                <option>Consultative</option><option>Premium</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="constraints">Additional constraints <span class="optional">Optional</span></label>
+              <input id="constraints" name="constraints" maxlength="2000" placeholder="e.g. Must use the existing hosting provider">
+            </div>
+          </div>
+
+          <fieldset class="mode-picker">
+            <legend>What would you like to create?</legend>
+            <div class="mode-options" role="group" aria-label="Generation mode">
+              <button class="mode-option is-selected" type="button" data-mode="proposal" aria-pressed="true">
+                <span class="mode-icon" aria-hidden="true">▤</span>
+                <span><strong>Full proposal</strong><small>Scope, plan &amp; pricing</small></span>
+              </button>
+              <button class="mode-option" type="button" data-mode="quote" aria-pressed="false">
+                <span class="mode-icon" aria-hidden="true">◇</span>
+                <span><strong>Quick quote</strong><small>Concise estimate</small></span>
+              </button>
+              <button class="mode-option" type="button" data-mode="email" aria-pressed="false">
+                <span class="mode-icon" aria-hidden="true">✉</span>
+                <span><strong>Client email</strong><small>Ready to personalize</small></span>
+              </button>
+            </div>
+          </fieldset>
+
+          <button class="button button-primary generate-button" id="generate-button" type="submit">
+            <span id="generate-label">Generate proposal</span>
+            <span class="button-arrow" aria-hidden="true">→</span>
+          </button>
+          <p class="form-footnote">Your brief is sent to the configured Ollama instance for generation and is not saved by PitchPilot.</p>
+        </form>
+      </section>
+
+      <section class="output panel" aria-labelledby="output-title">
+        <div class="panel-heading output-heading">
+          <div>
+            <p class="eyebrow">YOUR CLIENT-READY DRAFT</p>
+            <h2 id="output-title">Proposal preview</h2>
+          </div>
+          <span class="step-label">02 <span aria-hidden="true">/</span> 02</span>
+        </div>
+
+        <div id="output-empty" class="empty-state">
+          <div class="empty-illustration" aria-hidden="true">
+            <span class="paper paper-back"></span><span class="paper paper-front"><i></i><i></i><i></i></span>
+            <span class="sparkle">✳</span>
+          </div>
+          <h3>A thoughtful proposal starts here.</h3>
+          <p>Add your project details and generate a draft. You can edit every section before sharing it.</p>
+          <div class="empty-detail"><span aria-hidden="true">✦</span> Structured around your brief, not a generic chat</div>
+        </div>
+
+        <div id="loading-state" class="loading-state" hidden role="status" aria-live="polite">
+          <span class="loading-spinner" aria-hidden="true"></span>
+          <h3 id="loading-message">Reading the client brief…</h3>
+          <p>Local model generation may take a little while.</p>
+        </div>
+
+        <div id="error-state" class="error-state" hidden role="alert">
+          <span class="error-symbol" aria-hidden="true">!</span>
+          <div><h3>Couldn’t generate this draft</h3><p id="error-message"></p></div>
+        </div>
+
+        <div id="result-area" hidden>
+          <div class="result-toolbar">
+            <span id="result-mode-label" class="result-mode-label"></span>
+            <div class="toolbar-actions">
+              <button class="button button-small button-quiet" id="edit-button" type="button" aria-pressed="false">Edit</button>
+              <button class="button button-small button-quiet" id="regenerate-button" type="button">Regenerate</button>
+              <button class="button button-small button-quiet" id="new-button" type="button">New draft</button>
+            </div>
+          </div>
+          <article id="proposal-preview" class="proposal-preview" aria-label="Generated draft"></article>
+          <div class="result-footer">
+            <p class="pricing-disclaimer">AI-generated pricing is an estimate. Review scope, rates, taxes, and contract terms before sending it to a client.</p>
+            <div class="export-actions">
+              <button class="button button-secondary" id="copy-button" type="button">Copy draft</button>
+              <button class="button button-secondary" id="copy-email-button" type="button" disabled>Copy email</button>
+              <button class="button button-secondary" id="download-button" type="button">Download Markdown</button>
+              <button class="button button-secondary print-button" id="print-button" type="button">Print / save PDF</button>
+            </div>
+          </div>
+        </div>
+        <p id="app-message" class="app-message" role="status" aria-live="polite"></p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="page-footer">
+    <span>PitchPilot <span aria-hidden="true">·</span> Open source, no account required</span>
+    <span>Model inference runs locally through your Ollama instance.</span>
+  </footer>
+
+  <dialog id="privacy-dialog" class="privacy-dialog" aria-labelledby="privacy-title">
+    <div class="dialog-heading">
+      <div><p class="eyebrow">A CLEARER PICTURE</p><h2 id="privacy-title">Local AI &amp; your privacy</h2></div>
+      <button class="dialog-close" id="privacy-close" type="button" aria-label="Close privacy information">×</button>
+    </div>
+    <p>PitchPilot sends your project details to the Ollama instance configured for this application. With Ollama running on your own computer, the brief does not need to be sent to a proprietary cloud AI provider.</p>
+    <ul>
+      <li>PitchPilot does not intentionally persist client briefs on a server or database.</li>
+      <li>Generation is performed by the model shown in the status indicator.</li>
+      <li>Downloading Ollama and the model requires an internet connection. Local inference requires the model and Ollama to be available on your machine.</li>
+      <li>If you configure a remote Ollama host, that host receives your prompt. Check that host’s privacy and network configuration.</li>
+    </ul>
+    <button class="button button-primary dialog-done" id="privacy-done" type="button">Got it</button>
+  </dialog>
+</body>
+</html>
